@@ -1,65 +1,68 @@
-import PropTypes from "prop-types";
-import React, { useState } from "react";
-import s from "./ContactForm.module.css";
-import { nanoid } from "nanoid";
+import { addContact } from '../../redux/actions';
+import { getItems } from '../../redux/selectors';
+import PropTypes from 'prop-types';
 
-function ContactForm({ onSubmit }) {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-  const onChengeValue = (e) => {
+import s from './ContactForm.module.css';
+
+export default function ContactForm() {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const contacts = useSelector(getItems);
+  const dispatch = useDispatch();
+
+  const onChengeValue = e => {
     const { name, value } = e.currentTarget;
     switch (name) {
-      case "name":
+      case 'name':
         setName(value);
         break;
-      case "number":
+      case 'number':
         setNumber(value);
         break;
       default:
-        break;
+        return;
     }
   };
 
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    const id = nanoid();
-    onSubmit({ id, name, number });
-    setName("");
-    setNumber("");
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    if (contacts.some(contact => contact.name === name)) return alert(`${name} is already in contacts`);
+
+    dispatch(addContact(name, number));
+
+    e.currentTarget.reset();
   };
+
   return (
     <form className={s.form} onSubmit={handleSubmit}>
       <label>
-        name
+        Name
         <input
           className={s.input}
           type="text"
           name="name"
           onChange={onChengeValue}
-          value={name}
           required
         />
       </label>
-      <label className={s.title}>
-        number
+      <label>
+        Number
         <input
           className={s.input}
           type="tel"
           name="number"
           onChange={onChengeValue}
-          value={number}
           required
         />
       </label>
-      <button className={s.button} type="submit">
-        add to contact
-      </button>
+      <button className={s.button} type="submit">Add contact</button>
     </form>
   );
 }
-
-export default ContactForm;
 
 ContactForm.propTypes = {
   onSubmit: PropTypes.func,

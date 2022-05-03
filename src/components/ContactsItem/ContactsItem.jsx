@@ -1,31 +1,25 @@
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { removeContact } from '../../redux/actions';
 import s from './ContactsItem.module.css';
 
-function ContactsItem({
-  id,
-  name,
-  number,
-  index,
-  deleteContact,
-}) {
+function ContactsItem({ name, number }) {
+  const dispatch = useDispatch();
+  const deleteContact = e => dispatch(removeContact(e.currentTarget.parentNode.childNodes[0].data));
+
   return (
-    <div className={s.item}>
-      <span>{index + 1}</span>
-      <span>{name}</span>
-      <span>{number}</span>
-      <button className={s.button} onClick={() => deleteContact(id)}>
-        delete
+    <li className={s.item}>
+      {name}: {number}
+      <button className={s.button} type="button" onClick={deleteContact}>
+        remove
       </button>
-    </div>
+    </li>
   );
 }
 
 export default ContactsItem;
 
 ContactsItem.propTypes = {
-  id: PropTypes.string,
   name: PropTypes.string,
   number: PropTypes.string,
-  index: PropTypes.number,
-  deleteContact: PropTypes.func,
 };
